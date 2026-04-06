@@ -537,13 +537,13 @@ const Header = () => {
             />
           </NavLink>
           <i
-            className={`menu text-[4.5vw] cursor-pointer sm:text-[1.8rem] lg:hidden transition-all duration-300 ${
+            className={`menu text-[4.5vw] cursor-pointer sm:text-[1.8rem] hidden transition-all duration-300 ${
               menuToggle ? 'ri-close-line' : 'ri-menu-line'
             }`}
             onClick={menuClick}
           ></i>
           
-          <div className="hidden md:hidden lg:flex w-[78%] md:justify-between items-center">
+          <div className="flex w-[78%] justify-between items-center">
             <ul className="flex items-center gap-2 xl:gap-3">
               <li
                 onClick={handleServiceToggle}

@@ -38,7 +38,7 @@ const TIMING = {
 // 브라우저 설정
 // ============================================================
 const BROWSER_CONFIG = {
-  HEADLESS: false,                // 브라우저 창 표시 여부 (true: 숨김, false: 표시)
+  HEADLESS: true,                 // Instruqt VM에 X서버 없으므로 headless 필수
   SLOW_MO: 1000,                  // 동작 속도 지연 (밀리초, 0 = 최대 속도)
 };
 

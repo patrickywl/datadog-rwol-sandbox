@@ -7,28 +7,12 @@ import { datadogLogs } from '@datadog/browser-logs';
 const STORAGE_KEY = 'diagnostics_messages';
 
 const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
 const weekdayNames = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
+  'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
 ];
 
 const formatTimestamp = (timestamp) => {
@@ -69,7 +53,6 @@ const Diagnostics = () => {
         }
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.warn('Unable to parse stored diagnostics messages', error);
       localStorage.removeItem(STORAGE_KEY);
     }
@@ -102,11 +85,7 @@ const Diagnostics = () => {
     }
     const now = new Date().toISOString();
     setMessages((prev) => [
-      {
-        id: now,
-        message: trimmed,
-        createdAt: now,
-      },
+      { id: now, message: trimmed, createdAt: now },
       ...prev,
     ]);
     setMessage('');
@@ -120,8 +99,7 @@ const Diagnostics = () => {
     setActionMessage('⚠️ Runtime error triggered! Check Datadog RUM → Errors to see the uncaught exception.');
     setTimeout(() => {
       const obj = {};
-      // eslint-disable-next-line no-unused-expressions
-      obj.name.missingProperty; // Will throw to demonstrate runtime error capture
+      obj.name.missingProperty;
     }, 100);
   };
 
@@ -143,22 +121,27 @@ const Diagnostics = () => {
     setActionMessage('✅ Browser logs generated (INFO, WARN, ERROR, DEBUG). Check Datadog Logs.');
   };
 
-  const fetchDummyJson = async () => {
-    setActionMessage('🔄 Calling DummyJSON API...');
+  const fetchFromBackend = async () => {
+    const backendUrl = import.meta.env.REACT_APP_BACKEND_URL;
+    const apiUrl = backendUrl ? `${backendUrl}/api/products/1` : 'https://dummyjson.com/products/1';
+    const label = backendUrl ? 'Backend API (via APM)' : 'DummyJSON API (direct, no APM)';
+
+    setActionMessage(`🔄 Calling ${label}...`);
     try {
-      const response = await fetch('https://dummyjson.com/products/1');
+      const response = await fetch(apiUrl);
       const data = await response.json();
-      datadogLogs.logger.info('Diagnostics playground: DummyJSON response', {
+      datadogLogs.logger.info(`Diagnostics playground: ${label} response`, {
         feature: 'diagnostics-sandbox',
         productTitle: data?.title,
+        viaBackend: !!backendUrl,
       });
-      setActionMessage(`✅ DummyJSON API called successfully. Product: "${data?.title}". Check Datadog RUM → Resources.`);
+      setActionMessage(`✅ ${label} called successfully. Product: "${data?.title}". Check Datadog RUM → Resources.`);
     } catch (error) {
-      datadogLogs.logger.error('Diagnostics playground: DummyJSON request failed', {
+      datadogLogs.logger.error(`Diagnostics playground: ${label} request failed`, {
         feature: 'diagnostics-sandbox',
         error: error.message,
       });
-      setActionMessage('❌ DummyJSON API call failed. Check console or Datadog Logs for details.');
+      setActionMessage(`❌ ${label} call failed. Check console or Datadog Logs for details.`);
     }
   };
 
@@ -286,10 +269,10 @@ const Diagnostics = () => {
               </button>
               <button
                 type="button"
-                onClick={fetchDummyJson}
+                onClick={fetchFromBackend}
                 className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
               >
-                Call DummyJSON API
+                Call API (Backend / DummyJSON)
               </button>
             </div>
           </section>
@@ -301,4 +284,3 @@ const Diagnostics = () => {
 };
 
 export default Diagnostics;
-

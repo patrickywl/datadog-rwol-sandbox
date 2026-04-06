@@ -17,14 +17,13 @@ export const initializeDatadog = () => {
   const clientToken = getEnv('REACT_APP_CLIENT_TOKEN_RUM');
   const site = getEnv('REACT_APP_DD_SITE');
   const version = getEnv('REACT_APP_VERSION');
-  const service = getEnv('REACT_APP_DD_SERVICE', 'software-company-website');
-  const environment = getEnv('REACT_APP_DD_ENV', import.meta.env.MODE);
+  const service = getEnv('REACT_APP_DD_SERVICE', 'rwol-demo-frontend');
+  const environment = getEnv('REACT_APP_DD_ENV', 'rwol-workshop');
 
   if (!applicationId || !clientToken || !site) {
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
       console.warn(
-        'Datadog initialization skipped. Missing REACT_APP_* environment variables (applicationId, clientToken, site).',
+        'Datadog initialization skipped. Missing REACT_APP_* environment variables.',
       );
     }
     return;
@@ -35,13 +34,10 @@ export const initializeDatadog = () => {
     .map((url) => url.trim())
     .filter(Boolean);
 
-
-  // Check if user already exists in sessionStorage
   let user;
   const storedUser = sessionStorage.getItem('dd_current_user');
-  
+
   if (storedUser) {
-    // Use existing user from sessionStorage
     try {
       user = JSON.parse(storedUser);
     } catch (error) {
@@ -49,8 +45,7 @@ export const initializeDatadog = () => {
       user = null;
     }
   }
-  
-  // If no valid user in sessionStorage, use default and save it
+
   if (!user) {
     user = {
       id: '100',
@@ -59,15 +54,6 @@ export const initializeDatadog = () => {
       plan: 'standard',
       hasPaid: false
     };
-
-    // user = {
-    //   id: '200',
-    //   name: 'Whiwon Cho',
-    //   email: 'whiwon@premium-user.com',
-    //   plan: 'premium',
-    //   hasPaid: true
-    // };
-
     sessionStorage.setItem('dd_current_user', JSON.stringify(user));
   }
 
@@ -84,9 +70,7 @@ export const initializeDatadog = () => {
     startSessionReplayRecordingManually: false,
     trackResources: true,
     trackLongTasks: true,
-    // defaultPrivacyLevel: 'mask-user-input',
-    // allowedTracingUrls: allowedTracingUrls,
-    allowedTracingUrls: ["https://dummyjson.com"],
+    allowedTracingUrls: allowedTracingUrls.length > 0 ? allowedTracingUrls : [],
   });
 
   datadogRum.setUser(user);
@@ -95,7 +79,6 @@ export const initializeDatadog = () => {
     cartValue: true,
     amount: 99.99
   });
-
 
   datadogLogs.init({
     clientToken: clientToken,
@@ -110,5 +93,5 @@ export const initializeDatadog = () => {
   });
 
   hasInitialized = true;
+  console.log('[Datadog] RUM and Logs SDK initialized successfully');
 };
-
